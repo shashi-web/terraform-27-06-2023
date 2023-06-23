@@ -15,11 +15,11 @@ terraform {
   #   }
   # }
 
-  # backend "s3" {
-  #   bucket = "terraform-state-shashi"
-  #   key    = "terraform/statefile"
-  #   region = "us-east-1"
-  # }
+  backend "s3" {
+    bucket = "terraform-state-shashi21763453714"
+    key    = "terraform/statefile"
+    region = "us-east-1"
+  }
 
   required_providers {
     aws = {
