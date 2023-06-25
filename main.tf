@@ -33,7 +33,7 @@ module "nginx_server" {
   public_key  = var.public_key
   security_group_id = module.myapp_security_groups.security_group_id
   script_file = "nginx-entry-script.sh"
-  server_name = "nginx"
+  server_name = "nginx-1"
   keyname = "nginx"
 
 }
