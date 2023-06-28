@@ -37,23 +37,84 @@ resource "aws_instance" "web" {
   }
 }
 
-resource "aws_cloudwatch_dashboard" "nginx_dashboard" {
-  dashboard_name = "nginx-dashboard"
+resource "aws_cloudwatch_metric_alarm" "instance_status_alarm" {
+  alarm_name          = "instance-status-alarm"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  evaluation_periods  = "1"
+  metric_name         = "StatusCheckFailed"
+  namespace           = "AWS/EC2"
+  period              = "60"
+  statistic           = "SampleCount"
+  threshold           = "1"
+  alarm_description   = "Alarm for instance status check failure"
+  alarm_actions       = ["arn:aws:sns:us-east-1:419716525079:demo:fde4395f-33cf-4d78-a4dc-4e683e36af8f"]
+  dimensions = {
+    InstanceId = aws_instance.web.id
+  }
+}
 
-  dashboard_body = <<EOF
-{
-  "widgets": [
-    {
-      "type": "text",
-      "x": 0,
-      "y": 0,
-      "width": 12,
-      "height": 3,
-      "properties": {
-        "markdown": "# Instance Status\nStatus: [${aws_instance.web.instance_state}](instance-id)"
+resource "aws_cloudwatch_dashboard" "nginx2_dashboard" {
+  dashboard_name = "nginx2-dashboard"
+
+  dashboard_body = jsonencode({
+    widgets = [
+      {
+        type = "text",
+        x = 0,
+        y = 0,
+        width = 12,
+        height = 3,
+        properties = {
+          markdown = "# Instance Status"
+        }
+      },
+      {
+        type = "alarm",
+        x = 0,
+        y = 3,
+        width = 12,
+        height = 3,
+        properties = {
+          alarms = [aws_cloudwatch_metric_alarm.instance_status_alarm.arn],
+          title = "Instance Status Alarm",
+          period = 300,
+          stat = "SampleCount",
+          region = "us-east-1"
+        }
+      },
+      {
+        "type": "metric",
+        "x": 0,
+        "y": 6,
+        "width": 12,
+        "height": 6,
+        "properties": {
+          "metrics": [
+            [
+              "AWS/EC2",
+              "CPUUtilization",
+              {
+                "stat": "Average",
+                "period": 300,
+                "label": "CPU Utilization"
+              }
+            ]
+          ],
+          "view": "timeSeries",
+          "stacked": false,
+          "title": "CPU Utilization",
+          "region": "us-east-1",
+          "yAxis": {
+            "left": {
+              "min": 0,
+              "max": 100,
+              "showUnits": false
+            }
+          }
+        }
       }
-    }
-  ]
+    ]
+  })
 }
-EOF
-}
+
+
