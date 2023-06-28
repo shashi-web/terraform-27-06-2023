@@ -37,3 +37,23 @@ resource "aws_instance" "web" {
   }
 }
 
+resource "aws_cloudwatch_dashboard" "nginx_dashboard" {
+  dashboard_name = "nginx-dashboard"
+
+  dashboard_body = <<EOF
+{
+  "widgets": [
+    {
+      "type": "text",
+      "x": 0,
+      "y": 0,
+      "width": 12,
+      "height": 3,
+      "properties": {
+        "markdown": "# Instance Status\nStatus: [${aws_instance.web.state}](instance-id)"
+      }
+    }
+  ]
+}
+EOF
+}
