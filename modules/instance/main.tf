@@ -50,7 +50,7 @@ resource "aws_cloudwatch_dashboard" "nginx_dashboard" {
       "width": 12,
       "height": 3,
       "properties": {
-        "markdown": "# Instance Status\nStatus: [${aws_instance.web.state}](instance-id)"
+        "markdown": "# Instance Status\nStatus: [${aws_instance.web.instance_state}](instance-id)"
       }
     }
   ]
